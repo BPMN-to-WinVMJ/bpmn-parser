@@ -3,17 +3,24 @@ package com.example.model;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.example.model.event.*;
-import com.example.model.gateway.*;
-import com.example.model.task.*;
+
+import com.example.model.event.EndEvent;
+import com.example.model.event.Event;
+import com.example.model.event.IntermediateEvent;
+import com.example.model.event.StartEvent;
+import com.example.model.flow.Flow;
+import com.example.model.gateway.DataGateway;
+import com.example.model.gateway.EventGateway;
+import com.example.model.gateway.Gateway;
+import com.example.model.gateway.ParalelGateway;
+import com.example.model.task.ReceiveTask;
+import com.example.model.task.Task;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
 import lombok.Builder.Default;
-
-import com.example.model.flow.Flow;
-
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
@@ -67,11 +74,11 @@ public class BPMN {
 
     public String buildXml() {
         StringBuilder builder = new StringBuilder();
-        BPMNElement current = List.copyOf(Es.values()).getFirst();
+        BPMNElement current = List.copyOf(Es.values()).get(0);
         current.buildXml(builder);
-        current = current.getOut().getFirst().getTarget();
+        current = current.getOut().get(0).getTarget();
         current.buildXml(builder);
-        current = current.getOut().getFirst().getTarget();
+        current = current.getOut().get(0).getTarget();
         current.buildXml(builder);
         return builder.toString();
     }

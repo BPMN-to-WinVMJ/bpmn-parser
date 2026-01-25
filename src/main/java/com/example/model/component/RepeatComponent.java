@@ -14,7 +14,7 @@ public class RepeatComponent extends Component {
 
     @Override
     public void buildXml(StringBuilder builder) {
-        BPMNElement task = start.getOut().getFirst().getTarget();
+        BPMNElement task = start.getOut().get(0).getTarget();
         task.buildXml(builder);
         builder.append("<while condition=\"");
         for (Flow f : end.getOut()) {

@@ -23,19 +23,19 @@ public class PickComponent extends Component {
                 if (current instanceof Event) {
                     // TODO: change event to accept other kinds of event
                     builder.append(String.format("<receive name=%s>", current.getId()));
-                    current = current.getOut().getFirst().getTarget();
+                    current = current.getOut().get(0).getTarget();
                     if (current instanceof Gateway) {
                         builder.append("<empty/>");
                     } else {
                         current.buildXml(builder);
-                        current = current.getOut().getFirst().getTarget();
+                        current = current.getOut().get(0).getTarget();
                     }
                     builder.append(String.format("</receive>", current.getId()));
                     continue;
                 } else if (current instanceof Task){
                     current.buildXml(builder);
                 }
-                current = current.getOut().getFirst().getTarget();
+                current = current.getOut().get(0).getTarget();
             }
         }
     }

@@ -14,7 +14,7 @@ public class WhileRepeatComponent extends Component {
     
     @Override
     public void buildXml(StringBuilder builder) {
-        BPMNElement task = start.getOut().getFirst().getTarget();
+        BPMNElement task = start.getOut().get(0).getTarget();
         task.buildXml(builder);
         for (Flow f : end.getOut()) {
             System.err.println(f.getTarget().name);

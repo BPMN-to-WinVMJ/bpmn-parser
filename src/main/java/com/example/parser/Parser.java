@@ -197,8 +197,8 @@ public class Parser {
                 Task exitTask = (Task) component.getElements().get(component.getElements().size() -1);
                 component.setIn(enterTask.getIn());
                 component.setOut(exitTask.getOut());
-                enterTask.getIn().getFirst().setTarget(component);
-                exitTask.getOut().getFirst().setSource(component);
+                enterTask.getIn().get(0).setTarget(component);
+                exitTask.getOut().get(0).setSource(component);
                 X.removeAll(component.getElements());
                 X.add(component);
                 bpmn.getT().entrySet().removeIf(e -> component.getElements().contains(e.getValue()));
@@ -252,9 +252,9 @@ public class Parser {
         for(BPMNElement object : elements) {
             List<BPMNElement> visited = new ArrayList<>();
             // If previous element is gateway -> is either pick
-            if (bpmn.getGv().containsValue(object.getIn().getFirst().getSource())) continue;
+            if (bpmn.getGv().containsValue(object.getIn().get(0).getSource())) continue;
             // LEFT-MAXIMAL: do not start in the middle
-            if (Util.hasOneInOut(object.getIn().getFirst().getSource())) continue;
+            if (Util.hasOneInOut(object.getIn().get(0).getSource())) continue;
 
             BPMNElement current = object;
             boolean isLoop = false;
@@ -266,14 +266,14 @@ public class Parser {
                 visited.add(current);
                 
                 // depannya diverging / converging / end event
-                if (!(Util.hasOneInOut(current.getOut().getFirst().getTarget())) || bpmn.getEe().containsValue(current.getOut().getFirst().getTarget())) break;
-                current = current.getOut().getFirst().getTarget();
+                if (!(Util.hasOneInOut(current.getOut().get(0).getTarget())) || bpmn.getEe().containsValue(current.getOut().get(0).getTarget())) break;
+                current = current.getOut().get(0).getTarget();
             }
             if (!isLoop && visited.size() >= 2) {
                 components.add(SequenceComponent.builder()
                                 .elements(visited)
-                                .start(visited.getFirst())
-                                .end(visited.getLast())
+                                .start(visited.get(0))
+                                .end(visited.get(visited.size()-1))
                                 .build());
             }
         }
@@ -330,7 +330,7 @@ public class Parser {
                     break;
                 }
 
-                BPMNElement target = mid.getOut().getFirst().getTarget();
+                BPMNElement target = mid.getOut().get(0).getTarget();
 
                 // All branches must converge to same join
                 if (oc == null) {
@@ -372,8 +372,8 @@ public class Parser {
             }
 
             return FlowComponent.builder()
-                        .in(List.of(ic.getIn().getFirst()))
-                        .out(List.of(oc.getOut().getFirst()))
+                        .in(List.of(ic.getIn().get(0)))
+                        .out(List.of(oc.getOut().get(0)))
                         .start(ic)
                         .end(oc)
                         .elements(candidates.stream().map(x->(BPMNElement)x).toList())
@@ -405,7 +405,7 @@ public class Parser {
                     break;
                 }
 
-                BPMNElement target = mid.getOut().getFirst().getTarget();
+                BPMNElement target = mid.getOut().get(0).getTarget();
 
                 // All branches must converge to same join
                 if (oc == null) {
@@ -437,8 +437,8 @@ public class Parser {
             }
 
             return SwitchComponent.builder()
-                        .in(List.of(ic.getIn().getFirst()))
-                        .out(List.of(oc.getOut().getFirst()))
+                        .in(List.of(ic.getIn().get(0)))
+                        .out(List.of(oc.getOut().get(0)))
                         .start(ic)
                         .end(oc)
                         .elements(candidates.stream().map(x->(BPMNElement)x).toList())
@@ -468,7 +468,7 @@ public class Parser {
                     !(curr instanceof EndEvent) && 
                     !(curr instanceof StartEvent)) {
                     tempCandidates.add(curr);
-                    curr = curr.getOut().getFirst().getTarget();   
+                    curr = curr.getOut().get(0).getTarget();   
                 }
 
                 // curr bukan gateway ujung
@@ -511,8 +511,8 @@ public class Parser {
             }
 
             return PickComponent.builder()
-                        .in(List.of(ic.getIn().getFirst()))
-                        .out(List.of(oc.getOut().getFirst()))
+                        .in(List.of(ic.getIn().get(0)))
+                        .out(List.of(oc.getOut().get(0)))
                         .start(ic)
                         .end(oc)
                         .elements(candidates.stream().map(x->(BPMNElement)x).toList())
@@ -526,7 +526,7 @@ public class Parser {
         System.out.println("Finding while..");
 
         for (DataGateway ic : bpmn.getGm().values()) {
-            BPMNElement gd = ic.getOut().getFirst().getTarget();
+            BPMNElement gd = ic.getOut().get(0).getTarget();
 
             if (bpmn.getGd().containsValue(gd)) {
                 boolean isLoop = false;
@@ -539,11 +539,11 @@ public class Parser {
                     BPMNElement mid = f.getTarget();
                     if (!Util.hasOneInOut(mid)) continue;
 
-                    if (!(mid instanceof EndEvent) && mid.getOut().getFirst().getTarget().equals(ic)){
+                    if (!(mid instanceof EndEvent) && mid.getOut().get(0).getTarget().equals(ic)){
                         isLoop = true;
                         candidates.add(mid);
                         loopFlows.add(f); // supaya flow c1 gk ke ganti targetnya
-                        loopFlows.add(mid.getOut().getFirst()); // supaya flow t1 -> sink gk keubah targetnya
+                        loopFlows.add(mid.getOut().get(0)); // supaya flow t1 -> sink gk keubah targetnya
                     }
                 }
                 if (isLoop) {
@@ -588,16 +588,16 @@ public class Parser {
 
                 if (bpmn.getGm().containsValue(gm)) {
 
-                    Flow f2 = gm.getOut().getFirst();
+                    Flow f2 = gm.getOut().get(0);
                     BPMNElement mid = f2.getTarget();
                     
                     if (Util.hasOneInOut(mid)) {
-                        if (mid.getOut().getFirst().getTarget().equals(ic)) {
+                        if (mid.getOut().get(0).getTarget().equals(ic)) {
                             isLoop = true;
                             candidates.add(mid);
                             loopFlows.add(f);
                             loopFlows.add(f2);
-                            loopFlows.add(mid.getOut().getFirst());
+                            loopFlows.add(mid.getOut().get(0));
                             oc = gm;
                         }
                     }
@@ -635,11 +635,11 @@ public class Parser {
             List<BPMNElement> candidates = new ArrayList<>();
             candidates.add(sink);
 
-            BPMNElement mid = sink.getOut().getFirst().getTarget();
+            BPMNElement mid = sink.getOut().get(0).getTarget();
             if (!Util.hasOneInOut(mid)) continue;
             candidates.add(mid);
 
-            BPMNElement gd = mid.getOut().getFirst().getTarget();
+            BPMNElement gd = mid.getOut().get(0).getTarget();
             if (bpmn.getGd().containsValue(gd)) {
                 Gateway diverging = (Gateway) gd;
 
@@ -647,11 +647,11 @@ public class Parser {
                     BPMNElement mid2 = f.getTarget();
                     if (!Util.hasOneInOut(mid2)) continue;
 
-                    if (mid2.getOut().getFirst().getTarget().equals(sink)) {
+                    if (mid2.getOut().get(0).getTarget().equals(sink)) {
                         isLoop = true;
                         candidates.add(mid2);
                         loopFlows.add(f);
-                        loopFlows.add(mid2.getOut().getFirst());
+                        loopFlows.add(mid2.getOut().get(0));
                     }
                 }
 
@@ -710,7 +710,7 @@ public class Parser {
                 );   
             }
         }
-        return filterMinimal(result).getFirst();
+        return filterMinimal(result).get(0);
     }
 
     private static boolean allPathsConverge(
@@ -790,7 +790,7 @@ public class Parser {
         } else if (el instanceof ParalelGateway p) {
             return p.getIn().stream().map(x -> eventOnFlow(x, c)).toList();
         } else {
-            return List.of(eventOnFlow(el.getIn().getFirst(), c));
+            return List.of(eventOnFlow(el.getIn().get(0), c));
         }
     }
 

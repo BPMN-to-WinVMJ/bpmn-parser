@@ -15,7 +15,7 @@ public class SequenceComponent extends Component {
         builder.append(String.format("<Sequence name=\"%s\">", name));
         while (getElements().contains(current)) {
             current.buildXml(builder);
-            current = current.getOut().getFirst().getTarget();
+            current = current.getOut().get(0).getTarget();
         }
         builder.append("</Sequence>");
     }
