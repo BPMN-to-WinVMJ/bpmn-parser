@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- origin at X=0.0 Y=0.0 -->
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xs="http://www.w3.org/2001/XMLSchema" id="RepeatLoopExample" exporter="org.eclipse.bpmn2.modeler.core" exporterVersion="1.5.4.RC1-v20220528-0836-B1">
+  <bpmn2:process id="Process_1" isExecutable="false">
+    <bpmn2:startEvent id="StartEvent_1">
+      <bpmn2:outgoing>SF_1</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:exclusiveGateway id="GW_1" name="gateway 1" gatewayDirection="Converging">
+      <bpmn2:incoming>SF_1</bpmn2:incoming>
+      <bpmn2:incoming>SF_5</bpmn2:incoming>
+      <bpmn2:outgoing>SF_2</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:task id="Task_1" name="task 1">
+      <bpmn2:incoming>SF_2</bpmn2:incoming>
+      <bpmn2:outgoing>SF_3</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:exclusiveGateway id="GW_2" name="gateway 2" gatewayDirection="Diverging">
+      <bpmn2:incoming>SF_3</bpmn2:incoming>
+      <bpmn2:outgoing>SF_4</bpmn2:outgoing>
+      <bpmn2:outgoing>SF_6</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:endEvent id="EndEvent_1">
+      <bpmn2:incoming>SF_4</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:task id="Task_2" name="task 2">
+      <bpmn2:incoming>SF_6</bpmn2:incoming>
+      <bpmn2:outgoing>SF_5</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="SF_1" sourceRef="StartEvent_1" targetRef="GW_1"/>
+    <bpmn2:sequenceFlow id="SF_2" sourceRef="GW_1" targetRef="Task_1"/>
+    <bpmn2:sequenceFlow id="SF_3" sourceRef="Task_1" targetRef="GW_2"/>
+    <bpmn2:sequenceFlow id="SF_4" sourceRef="GW_2" targetRef="EndEvent_1"/>
+    <bpmn2:sequenceFlow id="SF_6" sourceRef="GW_2" targetRef="Task_2"/>
+    <bpmn2:sequenceFlow id="SF_5" sourceRef="Task_2" targetRef="GW_1"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="Diagram_1">
+    <bpmndi:BPMNPlane id="Plane_1" bpmnElement="Process_1">
+      <bpmndi:BPMNShape id="Shape_Start" bpmnElement="StartEvent_1">
+        <dc:Bounds height="36.0" width="36.0" x="50.0" y="200.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_1" labelStyle="BPMNLabelStyle_1"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW1" bpmnElement="GW_1" isMarkerVisible="true">
+        <dc:Bounds height="50.0" width="50.0" x="150.0" y="193.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_2" labelStyle="BPMNLabelStyle_1">
+          <dc:Bounds height="42.0" width="76.0" x="137.0" y="243.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task1" bpmnElement="Task_1">
+        <dc:Bounds height="50.0" width="110.0" x="250.0" y="190.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_3" labelStyle="BPMNLabelStyle_1">
+          <dc:Bounds height="21.0" width="48.0" x="281.0" y="204.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW2" bpmnElement="GW_2" isMarkerVisible="true">
+        <dc:Bounds height="50.0" width="50.0" x="400.0" y="193.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_4" labelStyle="BPMNLabelStyle_1">
+          <dc:Bounds height="42.0" width="76.0" x="387.0" y="243.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End" bpmnElement="EndEvent_1">
+        <dc:Bounds height="36.0" width="36.0" x="520.0" y="200.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_5" labelStyle="BPMNLabelStyle_1"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task2" bpmnElement="Task_2">
+        <dc:Bounds height="50.0" width="110.0" x="250.0" y="300.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_6" labelStyle="BPMNLabelStyle_1">
+          <dc:Bounds height="21.0" width="48.0" x="281.0" y="314.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_1" bpmnElement="SF_1" sourceElement="Shape_Start" targetElement="Shape_GW1">
+        <di:waypoint xsi:type="dc:Point" x="86.0" y="218.0"/>
+        <di:waypoint xsi:type="dc:Point" x="150.0" y="218.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_7"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_2" bpmnElement="SF_2" sourceElement="Shape_GW1" targetElement="Shape_Task1">
+        <di:waypoint xsi:type="dc:Point" x="200.0" y="218.0"/>
+        <di:waypoint xsi:type="dc:Point" x="250.0" y="218.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_8"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_3" bpmnElement="SF_3" sourceElement="Shape_Task1" targetElement="Shape_GW2">
+        <di:waypoint xsi:type="dc:Point" x="360.0" y="218.0"/>
+        <di:waypoint xsi:type="dc:Point" x="400.0" y="218.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_9"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_4" bpmnElement="SF_4" sourceElement="Shape_GW2" targetElement="Shape_End">
+        <di:waypoint xsi:type="dc:Point" x="450.0" y="218.0"/>
+        <di:waypoint xsi:type="dc:Point" x="520.0" y="218.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_10"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_6" bpmnElement="SF_6" sourceElement="Shape_GW2" targetElement="Shape_Task2">
+        <di:waypoint xsi:type="dc:Point" x="425.0" y="243.0"/>
+        <di:waypoint xsi:type="dc:Point" x="425.0" y="325.0"/>
+        <di:waypoint xsi:type="dc:Point" x="360.0" y="325.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_11"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_5" bpmnElement="SF_5" sourceElement="Shape_Task2" targetElement="Shape_GW1">
+        <di:waypoint xsi:type="dc:Point" x="250.0" y="325.0"/>
+        <di:waypoint xsi:type="dc:Point" x="175.0" y="325.0"/>
+        <di:waypoint xsi:type="dc:Point" x="175.0" y="243.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_12"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+    <bpmndi:BPMNLabelStyle id="BPMNLabelStyle_1">
+      <dc:Font name="arial" size="9.0"/>
+    </bpmndi:BPMNLabelStyle>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

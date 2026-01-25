@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- origin at X=0.0 Y=0.0 -->
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="Definitions_1" exporter="org.eclipse.bpmn2.modeler.core" exporterVersion="1.5.4.RC1-v20220528-0836-B1" targetNamespace="http://www.activiti.org/test">
+  <process id="myProcess" name="My process" isExecutable="true">
+    <endEvent id="endevent1" name="End"/>
+    <startEvent id="startevent1" name="Start">
+      <outgoing>flow1</outgoing>
+    </startEvent>
+    <userTask id="usertask1" activiti:async="true" activiti:exclusive="false" activiti:assignee="assignee1" activiti:candidateUsers="user1,user2,user3" activiti:candidateGroups="group1,group2" activiti:dueDate="due_date" activiti:category="category1" activiti:formKey="key" activiti:priority="0" activiti:skipExpression="false" name="User Task" isForCompensation="true">
+      <extensionElements>
+        <activiti:formProperty xsi:type="xsd:anyType" id="id1" name="field1" type="int" variable="field1" default="0" writable="false" required="true"/>
+        <activiti:formProperty xsi:type="xsd:anyType" id="id2" name="field2" type="date" variable="field2" default="2026-1-5" datePattern="yyyy-MM-dd" required="true"/>
+        <activiti:formProperty xsi:type="xsd:anyType" id="id3" name="field_enum" type="enum" variable="field_enum" required="true">
+          <activiti:value xsi:type="xsd:anyType" id="inner_id1" name="enum1"/>
+          <activiti:value xsi:type="xsd:anyType" id="inner_id2" name="enum2"/>
+        </activiti:formProperty>
+      </extensionElements>
+      <documentation id="Documentation_1">This is the documentation for user task 1</documentation>
+      <incoming>flow1</incoming>
+      <outgoing>flow2</outgoing>
+      <multiInstanceLoopCharacteristics id="MultiInstanceLoopCharacteristics_1" activiti:collection="collection" activiti:elementVariable="var" isSequential="true">
+        <loopCardinality xsi:type="tExpression" id="Expression_1"/>
+        <completionCondition xsi:type="tExpression" id="Expression_2"/>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask1"/>
+    <parallelGateway id="parallelgateway1" name="Parallel Gateway">
+      <incoming>flow2</incoming>
+      <outgoing>flow3</outgoing>
+      <outgoing>flow4</outgoing>
+    </parallelGateway>
+    <sequenceFlow id="flow2" name="flowName" sourceRef="usertask1" targetRef="parallelgateway1">
+      <documentation id="Documentation_2">Ini adalah flow</documentation>
+      <conditionExpression xsi:type="tFormalExpression" id="FormalExpression_1"><![CDATA[a == 2]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="parallelgateway1" targetRef="mailtask1">
+      <conditionExpression xsi:type="tFormalExpression" id="FormalExpression_2"><![CDATA[i == 2]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="parallelgateway1" targetRef="manualtask1">
+      <conditionExpression xsi:type="tFormalExpression" id="FormalExpression_3"><![CDATA[i == 1]]></conditionExpression>
+    </sequenceFlow>
+    <parallelGateway id="parallelgateway2" name="Parallel Gateway">
+      <incoming>flow5</incoming>
+      <incoming>flow6</incoming>
+      <outgoing>flow7</outgoing>
+    </parallelGateway>
+    <sequenceFlow id="flow5" sourceRef="mailtask1" targetRef="parallelgateway2"/>
+    <sequenceFlow id="flow6" sourceRef="manualtask1" targetRef="parallelgateway2"/>
+    <endEvent id="endevent2" name="End">
+      <incoming>flow7</incoming>
+    </endEvent>
+    <sequenceFlow id="flow7" sourceRef="parallelgateway2" targetRef="endevent2"/>
+    <manualTask id="manualtask1" name="User Task">
+      <incoming>flow4</incoming>
+      <outgoing>flow6</outgoing>
+    </manualTask>
+    <serviceTask id="mailtask1" activiti:type="mail" name="Service Task">
+      <extensionElements>
+        <activiti:field xsi:type="xsd:anyType" name="to">
+          <activiti:string xsi:type="xsd:anyType"><![CDATA[to]]></activiti:string>
+        </activiti:field>
+        <activiti:field xsi:type="xsd:anyType" name="from">
+          <activiti:string xsi:type="xsd:anyType"><![CDATA[from]]></activiti:string>
+        </activiti:field>
+        <activiti:field xsi:type="xsd:anyType" name="subject">
+          <activiti:string xsi:type="xsd:anyType"><![CDATA[subject]]></activiti:string>
+        </activiti:field>
+        <activiti:field xsi:type="xsd:anyType" name="cc">
+          <activiti:string xsi:type="xsd:anyType"><![CDATA[cc1]]></activiti:string>
+        </activiti:field>
+        <activiti:field xsi:type="xsd:anyType" name="bcc">
+          <activiti:string xsi:type="xsd:anyType"><![CDATA[bcc1]]></activiti:string>
+        </activiti:field>
+        <activiti:field xsi:type="xsd:anyType" name="charset">
+          <activiti:string xsi:type="xsd:anyType"><![CDATA[sdada]]></activiti:string>
+        </activiti:field>
+        <activiti:field xsi:type="xsd:anyType" name="html">
+          <activiti:string xsi:type="xsd:anyType"><![CDATA[<p></p>]]></activiti:string>
+        </activiti:field>
+        <activiti:field xsi:type="xsd:anyType" name="text">
+          <activiti:string xsi:type="xsd:anyType"><![CDATA[dadad]]></activiti:string>
+        </activiti:field>
+      </extensionElements>
+      <incoming>flow3</incoming>
+      <outgoing>flow5</outgoing>
+    </serviceTask>
+    <startEvent id="StartEvent_2" name="Start Event 2">
+      <outgoing>SequenceFlow_1</outgoing>
+    </startEvent>
+    <task id="Task_1" name="Task 1">
+      <incoming>SequenceFlow_1</incoming>
+      <outgoing>SequenceFlow_2</outgoing>
+    </task>
+    <sequenceFlow id="SequenceFlow_1" sourceRef="StartEvent_2" targetRef="Task_1"/>
+    <task id="Task_2" name="Task 2">
+      <incoming>SequenceFlow_2</incoming>
+      <outgoing>SequenceFlow_7</outgoing>
+    </task>
+    <sequenceFlow id="SequenceFlow_2" sourceRef="Task_1" targetRef="Task_2"/>
+    <intermediateCatchEvent id="IntermediateCatchEvent_1" name="Intermediate Catch Event 1">
+      <incoming>SequenceFlow_7</incoming>
+      <outgoing>SequenceFlow_8</outgoing>
+    </intermediateCatchEvent>
+    <sequenceFlow id="SequenceFlow_7" sourceRef="Task_2" targetRef="IntermediateCatchEvent_1"/>
+    <task id="Task_6" name="Task 6">
+      <incoming>SequenceFlow_8</incoming>
+      <outgoing>SequenceFlow_9</outgoing>
+    </task>
+    <sequenceFlow id="SequenceFlow_8" sourceRef="IntermediateCatchEvent_1" targetRef="Task_6"/>
+    <task id="Task_7" name="Task 7">
+      <incoming>SequenceFlow_9</incoming>
+      <outgoing>SequenceFlow_10</outgoing>
+    </task>
+    <sequenceFlow id="SequenceFlow_9" sourceRef="Task_6" targetRef="Task_7"/>
+    <endEvent id="EndEvent_2" name="End Event 2">
+      <incoming>SequenceFlow_10</incoming>
+    </endEvent>
+    <sequenceFlow id="SequenceFlow_10" sourceRef="Task_7" targetRef="EndEvent_2"/>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_myProcess">
+    <bpmndi:BPMNPlane id="BPMNPlane_myProcess" bpmnElement="myProcess">
+      <bpmndi:BPMNShape id="BPMNShape_endevent1" bpmnElement="endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="10520.0" y="3130.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_2" labelStyle="BPMNLabelStyle_1">
+          <omgdc:Bounds height="21.0" width="32.0" x="10521.0" y="3165.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_startevent1" bpmnElement="startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="4080.0" y="1220.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_3" labelStyle="BPMNLabelStyle_1">
+          <omgdc:Bounds height="21.0" width="38.0" x="4079.0" y="1255.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_usertask1" bpmnElement="usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="4200.0" y="1180.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_4" labelStyle="BPMNLabelStyle_1">
+          <omgdc:Bounds height="21.0" width="83.0" x="4211.0" y="1197.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_parallelgateway1" bpmnElement="parallelgateway1" isMarkerVisible="true">
+        <omgdc:Bounds height="40.0" width="40.0" x="4441.0" y="1210.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_5" labelStyle="BPMNLabelStyle_1">
+          <omgdc:Bounds height="42.0" width="71.0" x="4426.0" y="1250.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_parallelgateway2" bpmnElement="parallelgateway2" isMarkerVisible="true">
+        <omgdc:Bounds height="40.0" width="40.0" x="4730.0" y="1300.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_6" labelStyle="BPMNLabelStyle_1">
+          <omgdc:Bounds height="42.0" width="71.0" x="4715.0" y="1340.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endevent2" bpmnElement="endevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="4860.0" y="1320.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_7" labelStyle="BPMNLabelStyle_1">
+          <omgdc:Bounds height="21.0" width="32.0" x="4861.0" y="1355.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_manualtask1" bpmnElement="manualtask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="4560.0" y="1350.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_8" labelStyle="BPMNLabelStyle_1">
+          <omgdc:Bounds height="21.0" width="83.0" x="4571.0" y="1367.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_mailtask1" bpmnElement="mailtask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="4580.0" y="1240.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_9" labelStyle="BPMNLabelStyle_1">
+          <omgdc:Bounds height="21.0" width="105.0" x="4580.0" y="1257.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_StartEvent_2" bpmnElement="StartEvent_2">
+        <omgdc:Bounds height="36.0" width="36.0" x="62.0" y="302.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_30" labelStyle="BPMNLabelStyle_1">
+          <omgdc:Bounds height="42.0" width="61.0" x="50.0" y="338.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_1" bpmnElement="Task_1" isExpanded="true">
+        <omgdc:Bounds height="50.0" width="110.0" x="203.0" y="295.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_16" labelStyle="BPMNLabelStyle_1">
+          <omgdc:Bounds height="21.0" width="55.0" x="230.0" y="309.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_2" bpmnElement="Task_2" isExpanded="true">
+        <omgdc:Bounds height="50.0" width="110.0" x="418.0" y="295.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_18" labelStyle="BPMNLabelStyle_1">
+          <omgdc:Bounds height="21.0" width="55.0" x="445.0" y="309.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_IntermediateCatchEvent_1" bpmnElement="IntermediateCatchEvent_1">
+        <omgdc:Bounds height="36.0" width="36.0" x="596.0" y="302.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_20" labelStyle="BPMNLabelStyle_1">
+          <omgdc:Bounds height="63.0" width="103.0" x="563.0" y="338.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_6" bpmnElement="Task_6" isExpanded="true">
+        <omgdc:Bounds height="50.0" width="110.0" x="737.0" y="295.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_22" labelStyle="BPMNLabelStyle_1">
+          <omgdc:Bounds height="21.0" width="55.0" x="764.0" y="309.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_7" bpmnElement="Task_7" isExpanded="true">
+        <omgdc:Bounds height="50.0" width="110.0" x="952.0" y="295.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_24" labelStyle="BPMNLabelStyle_1">
+          <omgdc:Bounds height="21.0" width="55.0" x="979.0" y="309.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_EndEvent_2" bpmnElement="EndEvent_2">
+        <omgdc:Bounds height="36.0" width="36.0" x="1130.0" y="302.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_26" labelStyle="BPMNLabelStyle_1">
+          <omgdc:Bounds height="42.0" width="61.0" x="1118.0" y="338.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow1" bpmnElement="flow1" sourceElement="BPMNShape_startevent1" targetElement="BPMNShape_usertask1">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="4115.0" y="1237.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="4200.0" y="1207.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_10"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow2" bpmnElement="flow2" sourceElement="BPMNShape_usertask1" targetElement="BPMNShape_parallelgateway1">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="4305.0" y="1207.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="4470.0" y="1207.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="4481.0" y="1230.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_1">
+          <omgdc:Bounds height="21.0" width="79.0" x="4361.0" y="1208.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow3" bpmnElement="flow3" sourceElement="BPMNShape_parallelgateway1" targetElement="BPMNShape_mailtask1">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="4481.0" y="1230.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="4580.0" y="1267.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_11"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow4" bpmnElement="flow4" sourceElement="BPMNShape_parallelgateway1" targetElement="BPMNShape_manualtask1">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="4461.0" y="1250.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="4461.0" y="1377.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="4560.0" y="1377.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_12"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow5" bpmnElement="flow5" sourceElement="BPMNShape_mailtask1" targetElement="BPMNShape_parallelgateway2">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="4685.0" y="1267.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="4750.0" y="1267.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="4750.0" y="1300.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_13"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow6" bpmnElement="flow6" sourceElement="BPMNShape_manualtask1" targetElement="BPMNShape_parallelgateway2">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="4665.0" y="1377.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="4750.0" y="1377.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="4750.0" y="1340.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_14"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow7" bpmnElement="flow7" sourceElement="BPMNShape_parallelgateway2" targetElement="BPMNShape_endevent2">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="4770.0" y="1320.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="4860.0" y="1337.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_15"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="BPMNShape_StartEvent_2" targetElement="BPMNShape_Task_1">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="98.0" y="320.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="150.0" y="320.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="203.0" y="320.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_17"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="BPMNShape_Task_1" targetElement="BPMNShape_Task_2">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="313.0" y="320.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="365.0" y="320.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="418.0" y="320.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_19"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_7" bpmnElement="SequenceFlow_7" sourceElement="BPMNShape_Task_2" targetElement="BPMNShape_IntermediateCatchEvent_1">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="528.0" y="320.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="562.0" y="320.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="596.0" y="320.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_21"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_8" bpmnElement="SequenceFlow_8" sourceElement="BPMNShape_IntermediateCatchEvent_1" targetElement="BPMNShape_Task_6">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="632.0" y="320.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="684.0" y="320.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="737.0" y="320.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_23"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_9" bpmnElement="SequenceFlow_9" sourceElement="BPMNShape_Task_6" targetElement="BPMNShape_Task_7">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="847.0" y="320.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="899.0" y="320.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="952.0" y="320.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_25"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_10" bpmnElement="SequenceFlow_10" sourceElement="BPMNShape_Task_7" targetElement="BPMNShape_EndEvent_2">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1062.0" y="320.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1096.0" y="320.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1130.0" y="320.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_27"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+    <bpmndi:BPMNLabelStyle id="BPMNLabelStyle_1">
+      <omgdc:Font name="arial" size="9.0"/>
+    </bpmndi:BPMNLabelStyle>
+  </bpmndi:BPMNDiagram>
+</definitions>
