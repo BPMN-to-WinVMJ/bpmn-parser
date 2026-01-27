@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -187,7 +188,7 @@ public class Parser {
         X.remove(bpmn.getEe().values().stream().toArray(size -> new BPMNElement[size])[0]);
         PriorityQueue<Component> seqComponents = findMaxSequence(bpmn);
         while (X.size() > 1) { // While foldable
-            System.out.println(X);
+            System.out.println(X.stream().map(x -> Util.isBlankOrNull(x.getName()) ? x.getId() : x.getName()).toList());
             Component component = seqComponents.poll();
             if (component != null) {
                 componentCount += 1;
@@ -220,14 +221,7 @@ public class Parser {
                 }
                 X.removeAll(nonSeq.getElements()); 
                 X.add(nonSeq);
-                bpmn.getG().entrySet().removeIf(e -> nonSeq.getElements().contains(e.getValue()));
-                bpmn.getGf().entrySet().removeIf(e -> nonSeq.getElements().contains(e.getValue()));
-                bpmn.getGm().entrySet().removeIf(e -> nonSeq.getElements().contains(e.getValue()));
-                bpmn.getGd().entrySet().removeIf(e -> nonSeq.getElements().contains(e.getValue()));
-                bpmn.getT().entrySet().removeIf(e -> nonSeq.getElements().contains(e.getValue()));
-                bpmn.getTr().entrySet().removeIf(e -> nonSeq.getElements().contains(e.getValue()));
-                bpmn.getE().entrySet().removeIf(e -> nonSeq.getElements().contains(e.getValue()));
-                bpmn.getEi().entrySet().removeIf(e -> nonSeq.getElements().contains(e.getValue()));
+                Util.removeAllElements(bpmn, nonSeq);
                 System.out.println(Util.printComponent(nonSeq));
                 seqComponents = findMaxSequence(bpmn);
             } else {
@@ -236,6 +230,15 @@ public class Parser {
                 nonWellStructured.setName(COMPONENT_STRING + componentCount);
                 nonWellStructured.setId(COMPONENT_STRING + componentCount);
                 System.out.println(Util.printComponent(nonWellStructured));
+                for (Flow entering: nonWellStructured.getIn()) {
+                    entering.setTarget(nonWellStructured);
+                }
+                for (Flow exiting: nonWellStructured.getOut()) {
+                    exiting.setSource(nonWellStructured);
+                }
+                X.removeAll(nonWellStructured.getElements()); 
+                X.add(nonWellStructured);
+                Util.removeAllElements(bpmn, nonWellStructured);
                 seqComponents = findMaxSequence(bpmn);
             }
         }
@@ -334,7 +337,7 @@ public class Parser {
 
                 // All branches must converge to same join
                 if (oc == null) {
-                    if (!(target instanceof ParalelGateway) && ((ParalelGateway)target).getIn().size() == 1 ) break;
+                    if (!(target instanceof ParalelGateway) || ((ParalelGateway)target).getIn().size() == 1 ) break;
                     oc = (ParalelGateway) target;
                 } else if (!oc.equals(target)) {
                     oc = null;
@@ -680,9 +683,15 @@ public class Parser {
     }
 
     private static Component findMinNonWellStructuredComponent(BPMN bpmn) {
+        System.out.println("Finding NonWellStructuredComponent");
         Component sese =  findSESE(bpmn);
         return NonStructuredComponent.builder()
                 .preConds(allPreCondSets(sese))
+                .elements(sese.getElements())
+                .end(sese.getEnd())
+                .start(sese.getStart())
+                .in(sese.getIn())
+                .out(sese.getOut())
                 .build();
     }
 
@@ -692,9 +701,13 @@ public class Parser {
         for (Gateway ic : bpmn.getG().values()) {
             for (Gateway oc : bpmn.getG().values()) {
                 
-                Set<BPMNElement> region =
-                    collectNodesBetween(ic, oc);
+                if (ic.name.equals("g2") && oc.name.equals("g7")) {
+                    System.out.println("debug");
+                }
 
+                Set<BPMNElement> region = collectNodesBetween(ic, oc);
+
+                if (region == null) continue;
                 if (!allPathsConverge(ic, oc, region)) continue;
 
                 if (region.size() <= 2) continue;
@@ -718,13 +731,22 @@ public class Parser {
         Gateway oc,
         Set<BPMNElement> region) {
 
+        HashSet<BPMNElement> visited = new HashSet<>();
+        
+        int count = 0;
         for (BPMNElement n : region) {
             for (Flow out : n.getOut()) {
 
                 BPMNElement tgt = out.getTarget();
 
-                // If control leaves the region without hitting oc → invalid
-                if (!region.contains(tgt) && !tgt.equals(oc)) {
+                if (oc.equals(n)) {
+                    if (!region.contains(tgt)) {
+                        count += 1;
+                    } 
+                    if (count > 1) {
+                        return false;
+                    }
+                } else if (!pathConvergesToOC(tgt, oc, region, visited)) {
                     return false;
                 }
             }
@@ -732,19 +754,59 @@ public class Parser {
         return true;
     }
 
+    private static boolean pathConvergesToOC(
+        BPMNElement current,
+        Gateway oc,
+        Set<BPMNElement> region,
+        Set<BPMNElement> visited) {
+
+        // Prevent infinite loops
+        if (!visited.add(current)) {
+            return true; // loop is OK, doesn't violate convergence
+        }
+
+        // If we reached oc → valid
+        if (current.equals(oc)) {
+            return true;
+        }
+
+        // If we exit region NOT via oc → invalid
+        if (!region.contains(current)) {
+            return false;
+        }
+
+        // Dead-end inside region → invalid
+        if (current.getOut().isEmpty()) {
+            return false;
+        }
+
+        boolean result = true;
+        // All outgoing paths must converge
+        for (Flow out : current.getOut()) {
+            result &= pathConvergesToOC(out.getTarget(), oc, region, visited);
+        }
+
+        return result;
+    }
+
     private static Set<BPMNElement> collectNodesBetween(
         Gateway ic,
         Gateway oc) {
 
         Set<BPMNElement> fromIc = new HashSet<>();
+        fromIc.add(oc);
         Set<BPMNElement> toOc   = new HashSet<>();
+        toOc.add(ic);
 
         Util.forwardDFS(ic, fromIc);
         Util.backwardDFS(oc, toOc);
 
-        fromIc.retainAll(toOc);
 
-        return fromIc;
+        if (fromIc.stream().anyMatch(x -> toOc.contains(x)) && 
+            toOc.stream().anyMatch(y -> fromIc.contains(y))) {
+                return fromIc;
+        }
+        return null;
     }
     
 
@@ -778,10 +840,12 @@ public class Parser {
         return minimal;
     }
 
-    private static List<List<PreCond>> allPreCondSets(Component component){
-        return component.getElements().stream().map(
+    private static Map<BPMNElement, List<PreCond>> allPreCondSets(Component component){
+        return component.getElements().stream()
+        .collect(Collectors.toMap(
+            el -> el,
             el -> preCondSet(el, component)
-        ).toList();
+        ));
     }
 
     private static List<PreCond> preCondSet(BPMNElement el, Component c) {
@@ -798,19 +862,31 @@ public class Parser {
         BPMNElement xs = f.getSource();
         BPMNElement x = f.getTarget();
         if (!c.getElements().contains(xs)) {
-            return new StartPreCond(x);
+            return StartPreCond.builder()
+                    .x(x)
+                    .xs(null)
+                    .build();
         } else if (x instanceof Task || 
             x instanceof Event || 
             (x instanceof DataGateway d && d.getOut().size() == 1) || 
             (x instanceof ParalelGateway d && d.getOut().size() == 1)
         ) {
-            return new EndPreCond(xs);
+            return EndPreCond.builder()
+                    .xs(xs)
+                    .build();
         } else if (x instanceof ParalelGateway) {
-            return new FlowPreCond(xs ,x);
+            return FlowPreCond.builder()
+                    .xs(xs)
+                    .x(x)
+                    .build();
         } else if (x instanceof DataGateway) {
-            return new SwitchPreCond(xs, x);
+            return SwitchPreCond.builder()
+                                .x(x)
+                                .xs(xs)
+                                .c(f.getName())
+                                .build();
         } else if (x instanceof EventGateway) {
-            return new PickPreCond(xs, x);
+            return PickPreCond.builder().x(x).xs(xs).build();
         }
         return null;
     }

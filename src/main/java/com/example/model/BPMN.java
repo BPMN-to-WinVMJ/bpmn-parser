@@ -75,11 +75,11 @@ public class BPMN {
     public String buildXml() {
         StringBuilder builder = new StringBuilder();
         BPMNElement current = List.copyOf(Es.values()).get(0);
-        current.buildXml(builder);
+        current.buildXml(builder, 0);
         current = current.getOut().get(0).getTarget();
-        current.buildXml(builder);
+        current.buildXml(builder, 1);
         current = current.getOut().get(0).getTarget();
-        current.buildXml(builder);
+        current.buildXml(builder, 0);
         return builder.toString();
     }
 }

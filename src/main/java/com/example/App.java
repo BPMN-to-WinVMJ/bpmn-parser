@@ -10,7 +10,7 @@ public class App {
     public static void main( String[] args ) {
         System.out.println("running");
         try {
-            BPMN bpmn = Parser.parse(new File("demo\\src\\resource\\pick.bpmn2"));
+            BPMN bpmn = Parser.parse(new File("src\\resource\\complaintHandling.bpmn2"));
             System.out.println(bpmn.buildXml());
         } catch (Exception e) {
             e.printStackTrace();

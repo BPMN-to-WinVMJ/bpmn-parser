@@ -39,5 +39,5 @@ public abstract class BPMNElement {
         out = List.of(f);
     }
 
-    public abstract void buildXml(StringBuilder builder);
+    public abstract void buildXml(StringBuilder builder, int indent);
 }

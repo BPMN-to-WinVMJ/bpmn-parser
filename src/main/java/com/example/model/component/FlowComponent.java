@@ -1,8 +1,8 @@
 package com.example.model.component;
 
-import com.example.model.BPMNElement;
 import com.example.model.flow.Flow;
 
+import com.example.util.Util;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
@@ -12,11 +12,12 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class FlowComponent extends Component {
     
-    public void buildXml(StringBuilder builder) {
-        builder.append(String.format("<Flow name=\"%s\" >", name));
+    @Override
+    public void buildXml(StringBuilder builder, int indent) {
+        builder.append(Util.SPACE.repeat(indent) + String.format("<flow name=\"%s\">\n", name));
         for (Flow f : start.getOut()) {
-            f.getTarget().buildXml(builder);
+            f.getTarget().buildXml(builder, indent + 1);
         }
-        builder.append("</Flow>");
+        builder.append(Util.SPACE.repeat(indent) + "</flow>\n");
     }
 }

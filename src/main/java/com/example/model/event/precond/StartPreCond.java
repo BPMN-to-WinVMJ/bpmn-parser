@@ -1,10 +1,13 @@
 package com.example.model.event.precond;
 
-import com.example.model.BPMNElement;
+import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
-import lombok.AllArgsConstructor;
+@Getter
+@SuperBuilder
+public class StartPreCond extends PreCond{
+    @Override
+    public void buildXml(StringBuilder builder, int indent) {
 
-@AllArgsConstructor
-public class StartPreCond implements PreCond{
-    public BPMNElement x;
+    }
 }

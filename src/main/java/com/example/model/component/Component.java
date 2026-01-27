@@ -11,6 +11,7 @@ import lombok.experimental.SuperBuilder;
 import java.util.List;
 
 import com.example.model.BPMNElement;
+import com.example.model.task.Task;
 
 import java.util.ArrayList;
 
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public abstract class Component extends BPMNElement implements Comparable<Component> {
+public abstract class Component extends Task implements Comparable<Component> {
     @Default
     public List<BPMNElement> elements = new ArrayList<>();
     
