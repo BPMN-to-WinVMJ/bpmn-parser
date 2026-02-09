@@ -17,4 +17,10 @@ public class PreCond extends BPMNElement {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'buildXml'");
     }
+    
+    @Override
+    public boolean canContinue() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'canContinue'");
+    }
 }

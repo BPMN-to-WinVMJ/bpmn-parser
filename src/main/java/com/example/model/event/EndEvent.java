@@ -13,4 +13,8 @@ public class EndEvent extends Event {
     public void buildXml(StringBuilder builder, int indent) {
         builder.append(Util.SPACE.repeat(indent) + String.format("</process>\n"));
     }
+    @Override
+    public boolean canContinue() {
+        return false;
+    }
 }

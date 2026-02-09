@@ -27,5 +27,11 @@ public class WhileComponent extends Component {
 
         builder.append(Util.SPACE.repeat(indent) + "</while>\n");
     }
+
+    @Override
+    public String getFromStartToUser(String bpmnName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getFromStartToUser'");
+    }
     
 }

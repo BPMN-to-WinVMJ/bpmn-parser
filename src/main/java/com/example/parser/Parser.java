@@ -56,130 +56,12 @@ public class Parser {
 
         BPMN bpmn = new BPMN();
 
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
-
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(bpmnFile);
-
-        List<Element> tasks = new ArrayList<>();
-
-        NodeList taskNodes = doc.getElementsByTagNameNS(BPMN_NS, "task");
-        NodeList serviceTaskNodes = doc.getElementsByTagNameNS(BPMN_NS, "serviceTask");
-        NodeList userTaskNodes = doc.getElementsByTagNameNS(BPMN_NS, "userTask");
-        NodeList manualTaskNodes = doc.getElementsByTagNameNS(BPMN_NS, "manualTask");
-        NodeList receiveTaskNodes = doc.getElementsByTagNameNS(BPMN_NS, "receiveTask");
-
-        addAll(tasks, taskNodes);
-        addAll(tasks, serviceTaskNodes);
-        addAll(tasks, userTaskNodes);
-        addAll(tasks, manualTaskNodes);
-        addAll(tasks, receiveTaskNodes);
-
-        List<Element> events = new ArrayList<>();
-
-        addAll(events, doc.getElementsByTagNameNS(BPMN_NS, "startEvent"));
-        addAll(events, doc.getElementsByTagNameNS(BPMN_NS, "endEvent"));
-        addAll(events, doc.getElementsByTagNameNS(BPMN_NS, "intermediateCatchEvent"));
-        addAll(events, doc.getElementsByTagNameNS(BPMN_NS, "intermediateThrowEvent"));
-
-        List<Element> flows = new ArrayList<>();
-        addAll(flows, doc.getElementsByTagNameNS(BPMN_NS, "sequenceFlow"));
-
-        List<Element> gateways = new ArrayList<>();
-        addAll(gateways, doc.getElementsByTagNameNS(BPMN_NS, "parallelGateway"));
-        addAll(gateways, doc.getElementsByTagNameNS(BPMN_NS, "exclusiveGateway"));
-        addAll(gateways, doc.getElementsByTagNameNS(BPMN_NS, "eventBasedGateway"));
-
-        TaskParser taskParser = new TaskParser();
-        for (int i = 0; i < tasks.size(); i++) {
-            Element element = tasks.get(i);
-            Task task = (Task) taskParser.parse(element);
-            bpmn.getO().put(task.getId(), task);
-            bpmn.getT().put(task.getId(), task);
-            if (task instanceof ReceiveTask receiveTask) {
-                bpmn.getTr().put(task.getId(), receiveTask);
-            }
-        }
-
-        EventParser eventParser = new EventParser();
-        for (Element el : events) {
-            Event event = eventParser.parse(el);
-
-            bpmn.getO().put(event.getId(), event);
-            bpmn.getE().put(event.getId(), event);
-
-            if (event instanceof StartEvent se) {
-                bpmn.getEs().put(se.getId(), se);
-            }
-            if (event instanceof EndEvent ee) {
-                bpmn.getEe().put(ee.getId(), ee);
-            }
-            if (event instanceof IntermediateEvent ei) {
-                bpmn.getEi().put(ei.getId(), ei);
-            }
-        }
-
-        GatewayParser gatewayParser = new GatewayParser();
-        for (Element el: gateways) {
-            Gateway gateway = gatewayParser.parse(el);
-            bpmn.getG().put(gateway.getId(), gateway);
-            bpmn.getO().put(gateway.getId(), gateway);
-        }
-
-        FlowParser flowParser = new FlowParser();
-        for (Element el : flows) {
-            Flow flow = flowParser.parse(el);
-            BPMNElement sourceElem = bpmn.getO().get(el.getAttribute("sourceRef"));
-            BPMNElement targetElem = bpmn.getO().get(el.getAttribute("targetRef"));
-            if ((sourceElem instanceof Task && !sourceElem.getOut().isEmpty()) ||
-                targetElem instanceof Task && !targetElem.getIn().isEmpty()) {
-                throw new IllegalArgumentException("Task is branching " + sourceElem.name);
-            }
-            flow.setSource(sourceElem);
-            flow.setTarget(targetElem);
-            if (!(sourceElem instanceof Gateway)) {
-                sourceElem.setOut(flow);
-            }
-            if (!(targetElem instanceof Gateway)) {
-                targetElem.setIn(flow);
-            }
-            if (sourceElem instanceof Gateway g) {
-                g.getOut().add(flow);
-            }
-            if (targetElem instanceof Gateway g) {
-                g.getIn().add(flow);
-            }
-            bpmn.getF().put(flow.getId(), flow);
-        }
-
-        for (Gateway g : bpmn.getG().values()){
-            if (g instanceof ParalelGateway gf && g.getIn().size() == 1 && g.getOut().size() >= 1) {
-                gf.setRole(DataGateway.Role.DIVERGING);
-                bpmn.getGf().put(g.getId(), gf);
-            } else if (g instanceof ParalelGateway gj && g.getIn().size() >= 1 && g.getOut().size() == 1) {
-                gj.setRole(DataGateway.Role.MERGING);
-                bpmn.getGj().put(g.getId(), gj);
-            } else if (g instanceof DataGateway gd && g.getIn().size() == 1 && g.getOut().size() > 1) {
-                gd.setRole(DataGateway.Role.DIVERGING);
-                bpmn.getGd().put(g.getId(), gd);
-            } else if (g instanceof DataGateway gm && g.getIn().size() > 1 && g.getOut().size() == 1) {
-                gm.setRole(DataGateway.Role.MERGING);
-                bpmn.getGm().put(g.getId(), gm);
-            } else if (g instanceof EventGateway gv && g.getIn().size() == 1 && g.getOut().size() > 1) {
-                gv.setRole(DataGateway.Role.DIVERGING);
-                bpmn.getGv().put(g.getId(), gv);
-            } else {
-                throw new Exception(String.format("Gateway %s is both diverging and merging", g.getName()));
-            }
-        }
-
-        loopFold(bpmn);
+        addElements(bpmn, bpmnFile);
         
         return bpmn;
     }
     
-    private static BPMN loopFold(BPMN bpmn) {
+    public static BPMN loopFold(BPMN bpmn) {
 
         List<BPMNElement> X = new ArrayList<>(bpmn.getO().values());
 
@@ -200,6 +82,7 @@ public class Parser {
                 component.setOut(exitTask.getOut());
                 enterTask.getIn().get(0).setTarget(component);
                 exitTask.getOut().get(0).setSource(component);
+                Util.setOwnerComponent(component);
                 X.removeAll(component.getElements());
                 X.add(component);
                 bpmn.getT().entrySet().removeIf(e -> component.getElements().contains(e.getValue()));
@@ -219,6 +102,7 @@ public class Parser {
                 for (Flow exiting: nonSeq.getOut()) {
                     exiting.setSource(nonSeq);
                 }
+                Util.setOwnerComponent(nonSeq);
                 X.removeAll(nonSeq.getElements()); 
                 X.add(nonSeq);
                 Util.removeAllElements(bpmn, nonSeq);
@@ -236,6 +120,7 @@ public class Parser {
                 for (Flow exiting: nonWellStructured.getOut()) {
                     exiting.setSource(nonWellStructured);
                 }
+                Util.setOwnerComponent(nonWellStructured);
                 X.removeAll(nonWellStructured.getElements()); 
                 X.add(nonWellStructured);
                 Util.removeAllElements(bpmn, nonWellStructured);
@@ -889,6 +774,126 @@ public class Parser {
             return PickPreCond.builder().x(x).xs(xs).build();
         }
         return null;
+    }
+
+    public static void addElements(BPMN bpmn, File bpmnFile) throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(bpmnFile);
+
+        List<Element> tasks = new ArrayList<>();
+
+        NodeList taskNodes = doc.getElementsByTagNameNS(BPMN_NS, "task");
+        NodeList serviceTaskNodes = doc.getElementsByTagNameNS(BPMN_NS, "serviceTask");
+        NodeList userTaskNodes = doc.getElementsByTagNameNS(BPMN_NS, "userTask");
+        NodeList manualTaskNodes = doc.getElementsByTagNameNS(BPMN_NS, "manualTask");
+        NodeList receiveTaskNodes = doc.getElementsByTagNameNS(BPMN_NS, "receiveTask");
+
+        addAll(tasks, taskNodes);
+        addAll(tasks, serviceTaskNodes);
+        addAll(tasks, userTaskNodes);
+        addAll(tasks, manualTaskNodes);
+        addAll(tasks, receiveTaskNodes);
+
+        List<Element> events = new ArrayList<>();
+
+        addAll(events, doc.getElementsByTagNameNS(BPMN_NS, "startEvent"));
+        addAll(events, doc.getElementsByTagNameNS(BPMN_NS, "endEvent"));
+        addAll(events, doc.getElementsByTagNameNS(BPMN_NS, "intermediateCatchEvent"));
+        addAll(events, doc.getElementsByTagNameNS(BPMN_NS, "intermediateThrowEvent"));
+
+        List<Element> flows = new ArrayList<>();
+        addAll(flows, doc.getElementsByTagNameNS(BPMN_NS, "sequenceFlow"));
+
+        List<Element> gateways = new ArrayList<>();
+        addAll(gateways, doc.getElementsByTagNameNS(BPMN_NS, "parallelGateway"));
+        addAll(gateways, doc.getElementsByTagNameNS(BPMN_NS, "exclusiveGateway"));
+        addAll(gateways, doc.getElementsByTagNameNS(BPMN_NS, "eventBasedGateway"));
+
+        TaskParser taskParser = new TaskParser();
+        for (int i = 0; i < tasks.size(); i++) {
+            Element element = tasks.get(i);
+            Task task = (Task) taskParser.parse(element);
+            bpmn.getO().put(task.getId(), task);
+            bpmn.getT().put(task.getId(), task);
+            if (task instanceof ReceiveTask receiveTask) {
+                bpmn.getTr().put(task.getId(), receiveTask);
+            }
+        }
+
+        EventParser eventParser = new EventParser();
+        for (Element el : events) {
+            Event event = eventParser.parse(el);
+
+            bpmn.getO().put(event.getId(), event);
+            bpmn.getE().put(event.getId(), event);
+
+            if (event instanceof StartEvent se) {
+                bpmn.getEs().put(se.getId(), se);
+            }
+            if (event instanceof EndEvent ee) {
+                bpmn.getEe().put(ee.getId(), ee);
+            }
+            if (event instanceof IntermediateEvent ei) {
+                bpmn.getEi().put(ei.getId(), ei);
+            }
+        }
+
+        GatewayParser gatewayParser = new GatewayParser();
+        for (Element el: gateways) {
+            Gateway gateway = gatewayParser.parse(el);
+            bpmn.getG().put(gateway.getId(), gateway);
+            bpmn.getO().put(gateway.getId(), gateway);
+        }
+
+        FlowParser flowParser = new FlowParser();
+        for (Element el : flows) {
+            Flow flow = flowParser.parse(el);
+            BPMNElement sourceElem = bpmn.getO().get(el.getAttribute("sourceRef"));
+            BPMNElement targetElem = bpmn.getO().get(el.getAttribute("targetRef"));
+            if ((sourceElem instanceof Task && !sourceElem.getOut().isEmpty()) ||
+                targetElem instanceof Task && !targetElem.getIn().isEmpty()) {
+                throw new IllegalArgumentException("Task is branching " + sourceElem.name);
+            }
+            flow.setSource(sourceElem);
+            flow.setTarget(targetElem);
+            if (!(sourceElem instanceof Gateway)) {
+                sourceElem.setOut(flow);
+            }
+            if (!(targetElem instanceof Gateway)) {
+                targetElem.setIn(flow);
+            }
+            if (sourceElem instanceof Gateway g) {
+                g.getOut().add(flow);
+            }
+            if (targetElem instanceof Gateway g) {
+                g.getIn().add(flow);
+            }
+            bpmn.getF().put(flow.getId(), flow);
+        }
+
+        for (Gateway g : bpmn.getG().values()){
+            if (g instanceof ParalelGateway gf && g.getIn().size() == 1 && g.getOut().size() >= 1) {
+                gf.setRole(DataGateway.Role.DIVERGING);
+                bpmn.getGf().put(g.getId(), gf);
+            } else if (g instanceof ParalelGateway gj && g.getIn().size() >= 1 && g.getOut().size() == 1) {
+                gj.setRole(DataGateway.Role.MERGING);
+                bpmn.getGj().put(g.getId(), gj);
+            } else if (g instanceof DataGateway gd && g.getIn().size() == 1 && g.getOut().size() > 1) {
+                gd.setRole(DataGateway.Role.DIVERGING);
+                bpmn.getGd().put(g.getId(), gd);
+            } else if (g instanceof DataGateway gm && g.getIn().size() > 1 && g.getOut().size() == 1) {
+                gm.setRole(DataGateway.Role.MERGING);
+                bpmn.getGm().put(g.getId(), gm);
+            } else if (g instanceof EventGateway gv && g.getIn().size() == 1 && g.getOut().size() > 1) {
+                gv.setRole(DataGateway.Role.DIVERGING);
+                bpmn.getGv().put(g.getId(), gv);
+            } else {
+                throw new Exception(String.format("Gateway %s is both diverging and merging", g.getName()));
+            }
+        }
     }
 
     private static void addAll(List<Element> list, NodeList nodes) {

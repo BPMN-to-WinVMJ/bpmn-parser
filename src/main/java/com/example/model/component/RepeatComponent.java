@@ -28,5 +28,11 @@ public class RepeatComponent extends Component {
         task.buildXml(builder, indent + 1);
         builder.append(Util.SPACE.repeat(indent) + "</while>\n");
     }
+
+    @Override
+    public String getFromStartToUser(String bpmnName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getFromStartToUser'");
+    }
     
 }

@@ -22,6 +22,12 @@ public abstract class Gateway extends BPMNElement{
 
     @Override
     public void buildXml(StringBuilder builder, int indent) {
-        throw new UnsupportedOperationException(String.format("[GATEWAY %s]This is not supposed to be called", name));
+        throw new UnsupportedOperationException(String.format("[GATEWAY %s] buildXml is not supposed to be called", name));
+    }
+
+    @Override
+    public boolean canContinue() {
+        return true;
+        // throw new UnsupportedOperationException(String.format("[GATEWAY %s] canContinue is not supposed to be called", name));
     }
 }

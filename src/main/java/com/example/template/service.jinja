@@ -1,0 +1,10 @@
+package bpmn.product.{{ bpmnName }};
+
+import java.util.*; 
+import vmj.routing.route.VMJExchange;
+
+public class {{ bpmnName }}ServiceImpl extends {{ bpmnName }}Service {
+{% for task in tasks -%}
+{{ task.buildService(4) }}
+{%- endfor %}
+}

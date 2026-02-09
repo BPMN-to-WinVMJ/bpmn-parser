@@ -21,11 +21,13 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public abstract class Component extends Task implements Comparable<Component> {
+    
     @Default
     public List<BPMNElement> elements = new ArrayList<>();
-    
     public BPMNElement start;
     public BPMNElement end;
+
+    public abstract String getFromStartToUser(String bpmnName);
     
     @Override
     public int compareTo(Component other) {

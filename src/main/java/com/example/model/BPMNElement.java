@@ -3,6 +3,7 @@ package com.example.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.model.component.Component;
 import com.example.model.flow.Flow;
 
 import lombok.Builder.Default;
@@ -25,6 +26,8 @@ public abstract class BPMNElement {
     @Default
     List<Flow> out = new ArrayList<>();
 
+    Component ownerComponent;
+
     public void setIn(List<Flow> f){
         in = f;
     }
@@ -39,5 +42,10 @@ public abstract class BPMNElement {
         out = List.of(f);
     }
 
+    public abstract boolean canContinue();
+
     public abstract void buildXml(StringBuilder builder, int indent);
+    public String buildJinja(StringBuilder builder) {return builder.toString();};
+    public String buildResource(String name, int indent) {return "";};
+    public String buildService(int indent, boolean impl) {return "";};
 }

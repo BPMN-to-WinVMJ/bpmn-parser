@@ -20,18 +20,18 @@
     <bpmn2:endEvent id="EndEvent_1">
       <bpmn2:incoming>SF_4</bpmn2:incoming>
     </bpmn2:endEvent>
-    <bpmn2:task id="Task_2" name="task 4">
+    <bpmn2:userTask id="Task_2" name="task 4">
       <bpmn2:incoming>SF_6</bpmn2:incoming>
       <bpmn2:outgoing>SF_5</bpmn2:outgoing>
-    </bpmn2:task>
-    <bpmn2:task id="Task_3" name="task 1">
+    </bpmn2:userTask>
+    <bpmn2:userTask id="Task_3" name="task 1">
       <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
       <bpmn2:outgoing>SF_7</bpmn2:outgoing>
-    </bpmn2:task>
-    <bpmn2:task id="Task_4" name="task 2">
+    </bpmn2:userTask>
+    <bpmn2:userTask id="Task_4" name="task 2">
       <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
       <bpmn2:outgoing>SF_8</bpmn2:outgoing>
-    </bpmn2:task>
+    </bpmn2:userTask>
     <bpmn2:sequenceFlow id="SF_1" sourceRef="StartEvent_1" targetRef="GW_1"/>
     <bpmn2:sequenceFlow id="SF_4" sourceRef="GW_2" targetRef="EndEvent_1"/>
     <bpmn2:sequenceFlow id="SF_6" sourceRef="GW_2" targetRef="Task_2"/>

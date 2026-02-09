@@ -1,5 +1,8 @@
 package com.example.util;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.example.model.BPMN;
@@ -76,4 +79,32 @@ public class Util {
     public static boolean isBlankOrNull(String s) {
         return s == null || "".equals(s);
     }
+
+    public static void setOwnerComponent(Component c) {
+        for (BPMNElement e : c.getElements()) {
+            e.setOwnerComponent(c);
+        }
+    }
+
+    public static List<Task> traverseForward(BPMNElement e) {
+        Set<BPMNElement> visited = new HashSet<>();
+        List<BPMNElement> q = new ArrayList<>();
+        List<Task> res = new ArrayList<>();
+        q.add(e);
+
+        while (!q.isEmpty()) {
+            BPMNElement curr = q.remove(0);
+            if (!visited.add(curr)) {
+                continue;
+            }
+            if (curr instanceof Task t) {
+                res.add(t);
+            } else if (curr instanceof Component c) {
+                res.addAll(traverseForward(c.getStart()));
+            } else {
+                q.addAll(curr.getOut().stream().map(x -> x.getTarget()).toList());
+            }
+        }
+        return res;
+    } 
 }

@@ -18,13 +18,18 @@ public class WhileRepeatComponent extends Component {
         BPMNElement task = start.getOut().get(0).getTarget();
         task.buildXml(builder, indent);
         for (Flow f : end.getOut()) {
-            System.err.println(f.getTarget().name);
             if (this.getElements().contains(f.getTarget())) {
                 builder.append(Util.SPACE.repeat(indent) + "<while condition=\"c1\">\n");
                 f.getTarget().buildXml(builder, indent + 1);
                 builder.append(Util.SPACE.repeat(indent) + "</while>\n");
             }
         }
+    }
+
+    @Override
+    public String getFromStartToUser(String bpmnName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getFromStartToUser'");
     }
     
 }

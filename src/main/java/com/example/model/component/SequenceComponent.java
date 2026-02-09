@@ -1,6 +1,7 @@
 package com.example.model.component;
 
 import com.example.model.BPMNElement;
+import com.example.model.task.UserTask;
 import com.example.util.Util;
 
 import lombok.Data;
@@ -21,5 +22,30 @@ public class SequenceComponent extends Component {
             current = current.getOut().get(0).getTarget();
         }
         builder.append(Util.SPACE.repeat(indent) + "</sequence>\n");
+    }
+
+    @Override
+    public String getFromStartToUser(String bpmnName) {
+        StringBuilder builder = new StringBuilder();
+        for (BPMNElement el : getElements()) {
+            if (!(el instanceof Component)) {
+                if (!(el instanceof UserTask)) {
+                    builder.append(String.format("%sService.%s(requestBody, processId);\n", bpmnName, el.getName()));
+                } else {
+                    break;
+                }
+            } else {
+                Component c = (Component) el;
+                if (c.canContinue()) break;
+                builder.append(c.getFromStartToUser(bpmnName));
+            }
+        }
+
+        return builder.toString();
+    }
+
+    @Override
+    public boolean canContinue() {
+        return getElements().stream().allMatch(x -> x.canContinue());
     }
 }

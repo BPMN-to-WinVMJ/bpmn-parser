@@ -12,7 +12,7 @@ public class IntermediateEvent extends Event {
     
     @Override
     public void buildXml(StringBuilder builder, int indent) {
-        builder.append(Util.SPACE.repeat(indent) + String.format("<receive name=\"%s\"/>", name));
+        builder.append(Util.SPACE.repeat(indent) + String.format("<receive name=\"%s\"/>\n", name));
     }
     
 }

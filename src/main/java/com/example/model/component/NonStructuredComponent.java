@@ -117,4 +117,10 @@ public class NonStructuredComponent extends Component {
         }
         return "";
     }
+
+    @Override
+    public String getFromStartToUser(String bpmnName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getFromStartToUser'");
+    }
 }
