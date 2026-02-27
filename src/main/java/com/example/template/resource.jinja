@@ -15,6 +15,26 @@ public class {{ bpmnName }}ResourceImpl extends {{ bpmnName }}Component {
         }
     }
 
+        static interface ProcessService {
+        boolean upsert(ProcessInstance state); 
+        List<ProcessInstance> getAllById(String id);
+    }
+
+    static class ProcessServiceImpl implements ProcessService{
+        private static final List<ProcessInstance> STORE = new ArrayList<>();
+
+        public boolean upsert(ProcessInstance state) {
+            if (STORE.contains(state)) return true;
+            return STORE.add(state);
+        }
+
+        public List<ProcessInstance> getAllById(String id) {
+            return STORE.stream()
+                .filter(p -> id.equals(p.id))
+                .toList();
+        }
+    }
+	
     static interface {{ bpmnName }}Service {
 {% for task in tasks -%}
 {{ task.buildService(4, false) }}
@@ -27,6 +47,7 @@ public class {{ bpmnName }}ResourceImpl extends {{ bpmnName }}Component {
 {{ task.buildService(4, true) }}
 {%- endfor %}    }
 
+    private ProcessService processService = new ProcessServiceImpl(); // Asumsi ada database buat simpan sessionId -> state
     private {{ bpmnName }}Service {{ bpmnName }}ServiceImpl = new {{ bpmnName }}ServiceImpl();
 
 {% for task in userTasks -%}

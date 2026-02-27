@@ -18,10 +18,6 @@
       <name>Maven Central</name>
       <url>https://repo.maven.apache.org/maven2</url>
     </repository>
-    <repository>
-      <id>eclipse-releases</id>
-      <url>https://repo.eclipse.org/content/repositories/releases/</url>
-    </repository>
   </repositories>
 
   <properties>
@@ -51,30 +47,6 @@
       <artifactId>jinjava</artifactId>
       <version>2.8.2</version>
     </dependency>
-
-    <!-- BPMN2 Metamodel -->
-    <dependency>
-      <groupId>org.eclipse.bpmn2</groupId>
-      <artifactId>org.eclipse.bpmn2.model</artifactId>
-      <version>1.5.4</version>
-    </dependency>
-    <dependency>
-  <groupId>org.eclipse.emf</groupId>
-  <artifactId>org.eclipse.emf.ecore</artifactId>
-  <version>2.34.0</version>
-  </dependency>
-
-  <dependency>
-    <groupId>org.eclipse.emf</groupId>
-    <artifactId>org.eclipse.emf.common</artifactId>
-    <version>2.34.0</version>
-  </dependency>
-
-  <dependency>
-    <groupId>org.eclipse.emf</groupId>
-    <artifactId>org.eclipse.emf.ecore.xmi</artifactId>
-    <version>2.34.0</version>
-  </dependency>
   </dependencies>
 
   <build>
